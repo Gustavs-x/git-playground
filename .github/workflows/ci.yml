@@ -26,9 +26,14 @@ jobs:
           test -f README.md
           test -f test1.html
 
-      - name: Check basic HTML structure
-        shell: bash
-        run: |
-          grep -qi '<!DOCTYPE html>' test1.html
-          grep -qi '<html' test1.html
-          grep -qi '</html>' test1.html
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate HTML
+        run: npm run lint:html
