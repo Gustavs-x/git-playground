@@ -1,0 +1,13 @@
+{
+  "name": "compose-demo-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "5.2.1",
+    "redis": "6.2.1"
+  }
+}
