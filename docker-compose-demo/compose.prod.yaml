@@ -10,7 +10,7 @@ x-security-defaults: &security-defaults
 services:
   web:
     <<: *security-defaults
-    image: ghcr.io/gustavs-x/git-playground-web@sha256:8b4e2bef6da00c8cefd008bb7c62b15063d503b79d12865cbc687de900f2a8c3
+    image: ghcr.io/gustavs-x/git-playground-web@sha256:cb449921108f19d28cf312f65ede2d934aa14802dfd12f1ca6be3547493fa19a
     user: nginx
     restart: unless-stopped
     ports:
@@ -29,7 +29,7 @@ services:
 
   api:
     <<: *security-defaults
-    image: ghcr.io/gustavs-x/git-playground-api@sha256:09c6c9203b70bf51221112f683672d492a11190abdb0003c28900315408dd15d
+    image: ghcr.io/gustavs-x/git-playground-api@sha256:8afef360b5b240265d9a0c9cdba83ddc6d33a95c960050a487befb22140fdf04
     user: node
     init: true
     restart: unless-stopped
