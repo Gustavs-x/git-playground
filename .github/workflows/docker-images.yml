@@ -5,13 +5,19 @@ on:
     branches:
       - main
     paths:
-      - "docker-compose-demo/**"
+      - "docker-compose-demo/Dockerfile"
+      - "docker-compose-demo/.dockerignore"
+      - "docker-compose-demo/site/**"
+      - "docker-compose-demo/api/**"
       - ".github/workflows/docker-images.yml"
   push:
     branches:
       - main
     paths:
-      - "docker-compose-demo/**"
+      - "docker-compose-demo/Dockerfile"
+      - "docker-compose-demo/.dockerignore"
+      - "docker-compose-demo/site/**"
+      - "docker-compose-demo/api/**"
       - ".github/workflows/docker-images.yml"
   workflow_dispatch:
 

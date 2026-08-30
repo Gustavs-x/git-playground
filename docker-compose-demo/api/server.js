@@ -64,7 +64,7 @@ app.use((_req, res, next) => {
 app.use(express.json({ limit: "2kb" }));
 
 app.get("/health/live", (_req, res) => {
-  res.json({ status: "alive" });
+  res.json({ status: "alive", version: "2" });
 });
 
 app.get("/health/ready", async (_req, res) => {
