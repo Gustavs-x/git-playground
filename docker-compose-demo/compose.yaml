@@ -1,15 +1,40 @@
+name: docker-compose-demo
+
+x-security-defaults: &security-defaults
+  read_only: true
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+
 services:
   web:
+    <<: *security-defaults
     build: .
+    user: nginx
+    restart: unless-stopped
     ports:
-      - "127.0.0.1:8084:80"
+      - "127.0.0.1:${WEB_HOST_PORT:-8084}:8080"
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    cpus: "0.50"
+    mem_limit: 96m
+    pids_limit: 64
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:8080/ || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
 
   api:
+    <<: *security-defaults
     build: ./api
+    user: node
     init: true
     restart: unless-stopped
     ports:
-      - "127.0.0.1:8085:3000"
+      - "127.0.0.1:${API_HOST_PORT:-8085}:3000"
     environment:
       PORT: "3000"
       REDIS_URL: "redis://redis:6379"
@@ -17,6 +42,11 @@ services:
       REDIS_USERNAME: "api"
     secrets:
       - redis_password
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    cpus: "1.00"
+    mem_limit: 256m
+    pids_limit: 128
     depends_on:
       redis:
         condition: service_healthy
@@ -32,6 +62,7 @@ services:
       start_period: 10s
 
   redis:
+    <<: *security-defaults
     image: redis:8-alpine
     user: redis
     restart: unless-stopped
@@ -47,7 +78,10 @@ services:
     secrets:
       - redis_password
     tmpfs:
-      - /tmp:mode=1777
+      - /tmp:size=16m,mode=1777
+    cpus: "0.50"
+    mem_limit: 256m
+    pids_limit: 64
     volumes:
       - redis-data:/data
     healthcheck:
