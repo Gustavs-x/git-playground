@@ -2,7 +2,7 @@ name: docker-compose-demo
 
 services:
   web:
-    image: ghcr.io/gustavs-x/git-playground-web@sha256:35396d247241c1cc121cf62ec2cbfa6fd3b639d5906131ad062172231fb8241e
+    image: ghcr.io/gustavs-x/git-playground-web@sha256:28971f85dee94eaf12f210d28c983a19ebd8a355de1aedd639ae893b684cf9b5
     restart: unless-stopped
     ports:
       - "127.0.0.1:8084:80"
@@ -14,7 +14,7 @@ services:
       start_period: 5s
 
   api:
-    image: ghcr.io/gustavs-x/git-playground-api@sha256:69b0723f589b5104e1818d2deafd68346f1a0e9d194b8bf05e2b157f0ea38c14
+    image: ghcr.io/gustavs-x/git-playground-api@sha256:a44344876cdc6eb0ca7ad7127d4a14fbf391656d76ec78d230f2ba8a1fc639ea
     init: true
     restart: unless-stopped
     ports:
