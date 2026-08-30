@@ -1,20 +1,36 @@
 name: docker-compose-demo
 
+x-security-defaults: &security-defaults
+  read_only: true
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+
 services:
   web:
-    image: ghcr.io/gustavs-x/git-playground-web@sha256:35396d247241c1cc121cf62ec2cbfa6fd3b639d5906131ad062172231fb8241e
+    <<: *security-defaults
+    image: ghcr.io/gustavs-x/git-playground-web@sha256:8b4e2bef6da00c8cefd008bb7c62b15063d503b79d12865cbc687de900f2a8c3
+    user: nginx
     restart: unless-stopped
     ports:
-      - "127.0.0.1:8084:80"
+      - "127.0.0.1:8084:8080"
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    cpus: "0.50"
+    mem_limit: 96m
+    pids_limit: 64
     healthcheck:
-      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/ || exit 1"]
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:8080/ || exit 1"]
       interval: 10s
       timeout: 3s
       retries: 3
       start_period: 5s
 
   api:
-    image: ghcr.io/gustavs-x/git-playground-api@sha256:69b0723f589b5104e1818d2deafd68346f1a0e9d194b8bf05e2b157f0ea38c14
+    <<: *security-defaults
+    image: ghcr.io/gustavs-x/git-playground-api@sha256:09c6c9203b70bf51221112f683672d492a11190abdb0003c28900315408dd15d
+    user: node
     init: true
     restart: unless-stopped
     ports:
@@ -26,6 +42,11 @@ services:
       REDIS_PASSWORD_FILE: "/run/secrets/redis_password"
     secrets:
       - redis_password
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    cpus: "1.00"
+    mem_limit: 256m
+    pids_limit: 128
     depends_on:
       redis:
         condition: service_healthy
@@ -41,6 +62,7 @@ services:
       start_period: 10s
 
   redis:
+    <<: *security-defaults
     image: redis:8-alpine@sha256:becdda6c7f4b3fb42e42fd7f120bbf5c54c4caaaf16f26da24e4563d2c1f0576
     user: redis
     restart: unless-stopped
@@ -56,7 +78,10 @@ services:
     secrets:
       - redis_password
     tmpfs:
-      - /tmp:mode=1777
+      - /tmp:size=16m,mode=1777
+    cpus: "0.50"
+    mem_limit: 256m
+    pids_limit: 64
     volumes:
       - redis-data:/data
     healthcheck:
