@@ -33,9 +33,9 @@ env:
 
 jobs:
   verify:
-    if: github.event_name != 'push'
-    name: Verify ${{ matrix.image }} image
+    name: Build and scan ${{ matrix.image }} image
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     strategy:
       fail-fast: false
@@ -58,12 +58,28 @@ jobs:
         with:
           context: ${{ matrix.context }}
           platforms: linux/amd64
+          load: true
           push: false
           tags: local/git-playground-${{ matrix.image }}:verify
           cache-from: type=gha,scope=${{ matrix.image }}
           cache-to: type=gha,mode=max,scope=${{ matrix.image }}
 
+      - name: Scan image for fixable critical vulnerabilities
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          version: v0.74.0
+          scan-type: image
+          image-ref: local/git-playground-${{ matrix.image }}:verify
+          scanners: vuln
+          vuln-type: os,library
+          severity: CRITICAL
+          ignore-unfixed: true
+          hide-progress: true
+          format: table
+          exit-code: "1"
+
   publish:
+    needs: verify
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     name: Publish ${{ matrix.image }} image
     runs-on: ubuntu-latest
